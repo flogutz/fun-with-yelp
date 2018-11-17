@@ -1,0 +1,27 @@
+---
+title: "Fun with Yelp"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+In this document I am going to inspect a free data resource from Yelp in order to find interesting questions that can be further analysed.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r "setup", include=FALSE}
+knitr::opts_knit$set(root.dir = '../')
+source("main.R", chdir = T)
+```
+
+```{r}
+ glimpse(yelp_user.csv)
+```
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
