@@ -16,12 +16,13 @@
 
 ### LIBRARIES ###################################################
 
-install.packages('pacman', dependencies=TRUE, repos='http://cran.rstudio.com/')
+install.packages('plotly', dependencies=TRUE, repos='http://cran.rstudio.com/')
 require('pacman')
 p_load('tidyverse')
 p_load('tidytext')
 p_load('Hmisc')
 p_load('data.table')
+p_load('wordcloud')
 
 
 ### GETTING DATA ################################################
@@ -67,9 +68,10 @@ df.business <- as.tibble(yelp_business.csv) %>%
   left_join(df.business_activity, by = "business_id") %>% 
   mutate(keywords = gsub(';',' ',categories)) %>%
   rowwise() %>% 
-  mutate(business = if_else(length(grep('fashion',keywords,ignore.case = T))>0,'fashion',
+  mutate(business = if_else(length(grep('fashion',keywords,ignore.case = T))>0|length(grep('clothing',keywords,ignore.case = T))>0,'fashion',
                             ifelse(length(grep('travel',keywords,ignore.case = T))>0,'travel','other'))) %>% 
   ungroup()
+
 
 # most used keywords in categories
 df.count_business <- df.business %>% 
@@ -81,9 +83,10 @@ df.count_business <- df.business %>%
 df.business_agg <- df.business %>% 
   group_by(business) %>% 
   summarise(average_stars = mean(stars,na.rm = T), average_review_count = mean(review_count, na.rm = T),
-            average_start_date = mean(prox_start_date), average_checkins = mean(avg_checkins, na.rm = T))
-            
+            average_start_date = mean(prox_start_date), average_checkins = mean(avg_checkins, na.rm = T), count = n())
+          
 
-
-
-
+# Word cloud
+wordcloud(words = df.count_business$word, freq = df.count_business$n, min.freq = 1,
+          max.words=150, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
