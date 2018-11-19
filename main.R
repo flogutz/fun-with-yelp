@@ -19,17 +19,19 @@
 install.packages('pacman', dependencies=TRUE, repos='http://cran.rstudio.com/')
 require('pacman')
 p_load('tidyverse')
+p_load('tidytext')
 p_load('Hmisc')
 p_load('data.table')
 
-### GETTING DATA ################################################
 
+### GETTING DATA ################################################
 filelist <- list.files(path="data")
 
-# for(i in filelist){
-#   tmp <- read.csv(paste("data/",i,sep=""),sep=',',stringsAsFactors=F)
-#   assign(i,tmp)
-# }
+for(i in filelist){
+  tmp <- read.csv(paste("data/",i,sep=""),sep=',',stringsAsFactors=F)
+  assign(i,tmp)
+  
+}
 
 ### EXPLORING DATA ##############################################
 
@@ -60,11 +62,28 @@ df.business_activity <- yelp_checkin.csv %>%
   group_by(business_id) %>% 
   summarise(avg_checkins = mean(checkins))
 
-df.business <- yelp_business.csv %>% 
+df.business <- as.tibble(yelp_business.csv) %>% 
   left_join(df.first_entry, by = "business_id") %>% 
-  left_join(df.business_activity, by = "business_id")
+  left_join(df.business_activity, by = "business_id") %>% 
+  mutate(keywords = gsub(';',' ',categories)) %>%
+  rowwise() %>% 
+  mutate(business = if_else(length(grep('fashion',keywords,ignore.case = T))>0,'fashion',
+                            ifelse(length(grep('travel',keywords,ignore.case = T))>0,'travel','other'))) %>% 
+  ungroup()
+
+# most used keywords in categories
+df.count_business <- df.business %>% 
+  unnest_tokens(word, keywords) %>% 
+  count(word, sort = TRUE)
 
 
-#counts = as.data.frame(xtabs(~text))
-#strsplit(df.business$categories[1],';')
+# Aggregates
+df.business_agg <- df.business %>% 
+  group_by(business) %>% 
+  summarise(average_stars = mean(stars,na.rm = T), average_review_count = mean(review_count, na.rm = T),
+            average_start_date = mean(prox_start_date), average_checkins = mean(avg_checkins, na.rm = T))
+            
+
+
+
 
