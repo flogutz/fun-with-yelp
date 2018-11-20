@@ -9,15 +9,32 @@ In this document I am going to inspect a free data resource from Yelp in order t
 
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
-```{r "setup", include=FALSE}
+```{r "setup", include=FALSE, echo=FALSE, cache=FALSE, message=FALSE}
 knitr::opts_knit$set(root.dir = '../')
-source("main.R", chdir = T)
+star_pred_model_xgb <- readRDS('model_xgb.rds')
+df.business_agg <- readRDS('df_business_agg.rds')
+df.count_business <- readRDS('df_count_business.rds')
+require('pacman')
+p_load('wordcloud')
+p_load('caret')
+p_load('kableExtra')
 ```
 
-```{r}
- glimpse(yelp_user.csv)
+```{r wordcloud, results='asis', echo=FALSE,fig.align='center'}
+wordcloud(words = df.count_business$word, freq = df.count_business$n, min.freq = 1,
+          max.words=150, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
 ```
 
+
+```{r wordcount, results='asis', echo=FALSE,fig.align='center'}
+
+```
+
+```{r table,results='asis', warning=FALSE, cache=TRUE, message=FALSE,fig.align='center'}
+df <- varImp(star_pred_model_xgb)
+kable(df$importance)
+```
 
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.

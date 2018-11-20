@@ -16,7 +16,7 @@
 
 ### LIBRARIES ###################################################
 
-install.packages('plotly', dependencies=TRUE, repos='http://cran.rstudio.com/')
+install.packages('pacman', dependencies=TRUE, repos='http://cran.rstudio.com/')
 require('pacman')
 p_load('tidyverse')
 p_load('tidytext')
@@ -26,6 +26,7 @@ p_load('wordcloud')
 
 
 ### GETTING DATA ################################################
+
 filelist <- list.files(path="data")
 
 for(i in filelist){
@@ -37,6 +38,7 @@ for(i in filelist){
 ### EXPLORING DATA ##############################################
 
 ## Getting an idea whether or not businees attributes can be used as features
+
 df.atr<- as.tibble(yelp_business_attributes.csv) 
 df.atr[ df.atr == "Na" ] <- NA
 df.atr[ df.atr == "True" ] <- TRUE
@@ -51,7 +53,6 @@ colnames(df.distinct_attr) <- "na_ratio"
 df.distinct_attr <- setDT(df.distinct_attr, keep.rownames = TRUE)[] %>% 
   arrange(na_ratio) %>% 
   top_n(.,-10,na_ratio)
-
 
 ## Business check-ins and first appearance on yelp
 
@@ -78,6 +79,7 @@ df.count_business <- df.business %>%
   unnest_tokens(word, keywords) %>% 
   count(word, sort = TRUE)
 
+#saveRDS(df.count_business,file="~/repos/fun-with-yelp/df_count_business.rds")
 
 # Aggregates
 df.business_agg <- df.business %>% 
@@ -85,6 +87,7 @@ df.business_agg <- df.business %>%
   summarise(average_stars = mean(stars,na.rm = T), average_review_count = mean(review_count, na.rm = T),
             average_start_date = mean(prox_start_date), average_checkins = mean(avg_checkins, na.rm = T), count = n())
           
+#saveRDS(df.business_agg,file="~/repos/fun-with-yelp/df_business_agg.rds")
 
 # Word cloud
 wordcloud(words = df.count_business$word, freq = df.count_business$n, min.freq = 1,
